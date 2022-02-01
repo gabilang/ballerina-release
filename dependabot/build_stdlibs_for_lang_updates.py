@@ -64,7 +64,7 @@ def clone_repositories():
     global exit_code
 
     # Clone ballerina-lang repo
-    exit_code = os.system(f"git clone {constants.BALLERINA_ORG_URL}ballerina-lang.git")
+    exit_code = os.system(f"git clone https://github.com/gabilang/ballerina-lang.git")
     if exit_code != 0:
         sys.exit(1)
 
@@ -104,6 +104,7 @@ def build_stdlib_repositories(ballerina_lang_branch, enable_tests):
         sys.exit(1)
 
     # Build standard library repos
+    should_exit = False
     for level in stdlib_modules_by_level:
         stdlib_modules = stdlib_modules_by_level[level]
         for module in stdlib_modules:
@@ -114,7 +115,11 @@ def build_stdlib_repositories(ballerina_lang_branch, enable_tests):
                                   f"./gradlew clean build{cmd_exclude_tests} publishToMavenLocal --stacktrace --scan")
             if exit_code != 0:
                 print(f"Build failed for {module}")
-                sys.exit(1)
+                # sys.exit(1)
+                should_exit = True
+
+    if should_exit:
+        sys.exit(1)
 
     # Build ballerina-distribution repo
     exit_code = os.system(f"cd ballerina-distribution;" +
